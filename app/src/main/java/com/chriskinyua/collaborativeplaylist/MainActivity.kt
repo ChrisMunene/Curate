@@ -1,70 +1,52 @@
 package com.chriskinyua.collaborativeplaylist
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import com.spotify.android.appremote.api.ConnectionParams
-import com.spotify.android.appremote.api.Connector
-import com.spotify.android.appremote.api.SpotifyAppRemote
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.NavigationUI
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
+import com.chriskinyua.collaborativeplaylist.state.GlobalState
 import com.spotify.protocol.types.Track
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_scrolling.*
 
 class MainActivity : AppCompatActivity() {
 
-    private val clientId = "23435e1e97574bbab9f95fb2923baefe"
-    private val redirectUri = "https://com.chriskinyua.collaborativeplaylist/callback"
-    private var spotifyAppRemote: SpotifyAppRemote? = null
+    private lateinit var state: GlobalState
+    private val TAG = MainActivity::class.java.simpleName
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        val navView: BottomNavigationView = findViewById(R.id.nav_view)
+
+        state = application as GlobalState
+
+        val navController = findNavController(R.id.nav_host_fragment)
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        val appBarConfiguration = AppBarConfiguration(
+            setOf(
+                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications
+            )
+        )
+
+        setupActionBarWithNavController( navController, appBarConfiguration)
+        navView.setupWithNavController(navController)
+
+        playMusic()
     }
 
-    override fun onStart() {
-        super.onStart()
-        val connectionParams = ConnectionParams.Builder(clientId)
-            .setRedirectUri(redirectUri)
-            .showAuthView(true)
-            .build()
-
-        SpotifyAppRemote.connect(this, connectionParams, object : Connector.ConnectionListener {
-            override fun onConnected(appRemote: SpotifyAppRemote) {
-                spotifyAppRemote = appRemote
-                tvStatus.text = "Connected! Yay"
-                Log.d("MainActivity", "Connected! Yay!")
-                // Now you can start interacting with App Remote
-                connected()
-            }
-
-            override fun onFailure(throwable: Throwable) {
-                tvStatus.text = "Something Went Wrong"
-                tvStatus.setTextColor(resources.getColor(R.color.colorAccent))
-                Log.e("MainActivity", throwable.message, throwable)
-                // Something went wrong when attempting to connect! Handle errors here
-            }
-        })
-    }
-
-    private fun connected() {
-        spotifyAppRemote?.let {
+    private fun playMusic() {
+        state.spotifyAppRemote?.let {
             // Play a playlist
-            val playlistURI = "spotify:playlist:37i9dQZF1DX2sUQwD7tbmL"
+            val playlistURI = "spotify:playlist:2JkFKKEFIDK1YEPiA6Omw3"
             it.playerApi.play(playlistURI)
-            // Subscribe to PlayerState
-            it.playerApi.subscribeToPlayerState().setEventCallback {
-                val track: Track = it.track
-                Log.d("MainActivity", track.name + " by " + track.artist.name)
-            }
         }
 
     }
 
-    override fun onStop() {
-        super.onStop()
-        spotifyAppRemote?.let {
-            SpotifyAppRemote.disconnect(it)
-        }
-
-    }
 }
-
