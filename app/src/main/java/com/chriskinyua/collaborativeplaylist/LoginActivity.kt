@@ -76,6 +76,7 @@ class LoginActivity : AppCompatActivity() {
             when (response.type) {
                 AuthenticationResponse.Type.TOKEN -> {
                     state.ACCESS_TOKEN = response.accessToken
+                    state.spotifyHeaders["Authorization"] = "Bearer ${response.accessToken}"
                     val intent = Intent(this@LoginActivity,MainActivity::class.java)
                     startActivity(intent)
                 }

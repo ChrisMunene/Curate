@@ -1,17 +1,17 @@
 package com.chriskinyua.collaborativeplaylist
 
 import android.os.Bundle
-import android.util.Log
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.chriskinyua.collaborativeplaylist.network.SpotifyWebApi
 import com.chriskinyua.collaborativeplaylist.state.GlobalState
-import com.spotify.protocol.types.Track
-import kotlinx.android.synthetic.main.activity_scrolling.*
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -37,7 +37,14 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController( navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        playMusic()
+        val retrofit = Retrofit.Builder()
+            .baseUrl(SpotifyWebApi.BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        state.spotifyWebApi = retrofit.create(SpotifyWebApi::class.java)
+
+//        playMusic()
     }
 
     private fun playMusic() {
