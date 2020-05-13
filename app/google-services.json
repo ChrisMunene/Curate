@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "520858016840",
+    "firebase_url": "https://collaborativeplaylist-93c36.firebaseio.com",
+    "project_id": "collaborativeplaylist-93c36",
+    "storage_bucket": "collaborativeplaylist-93c36.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:520858016840:android:187d1138187a142a00cc7d",
+        "android_client_info": {
+          "package_name": "com.chriskinyua.collaborativeplaylist"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "520858016840-lfutjnvu63c959an7lh8a3vgml22og0u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chriskinyua.collaborativeplaylist",
+            "certificate_hash": "07c1ea67602e80108e991c8a7c3795b97fbd5443"
+          }
+        },
+        {
+          "client_id": "520858016840-k1t9jflukkcrhu21m9fhdsb6v7l32p74.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA8IVFs7inpG4fI-Qbnc_NddtCtBO1kCuk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "520858016840-k1t9jflukkcrhu21m9fhdsb6v7l32p74.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

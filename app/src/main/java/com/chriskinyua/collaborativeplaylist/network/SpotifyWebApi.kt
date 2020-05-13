@@ -1,6 +1,6 @@
 package com.chriskinyua.collaborativeplaylist.network
 
-import com.chriskinyua.collaborativeplaylist.data.SearchResult
+import com.chriskinyua.collaborativeplaylist.data.SearchResults
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -13,5 +13,5 @@ interface SpotifyWebApi{
     @GET("search")
     fun search(@HeaderMap headers: Map<String, String>,
                      @Query("q") query: String,
-               @Query("type") type: String): Call<SearchResult>
+               @Query("type") type: String): Call<SearchResults>
 }

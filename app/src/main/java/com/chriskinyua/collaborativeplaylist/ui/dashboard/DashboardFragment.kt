@@ -1,58 +1,102 @@
 package com.chriskinyua.collaborativeplaylist.ui.dashboard
 
+import android.app.Activity
+import android.content.Context
 import android.os.Bundle
-import android.util.Log
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
+import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.chriskinyua.collaborativeplaylist.MainActivity
 import com.chriskinyua.collaborativeplaylist.R
-import com.chriskinyua.collaborativeplaylist.data.SearchResult
+import com.chriskinyua.collaborativeplaylist.RecommendationDialog
+import com.chriskinyua.collaborativeplaylist.adapter.SearchResultAdapter
 import com.chriskinyua.collaborativeplaylist.state.GlobalState
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.chriskinyua.collaborativeplaylist.ui.SharedViewModel
+import com.chriskinyua.shoppinglist.touch.ListRecyclerTouchCallback
+
 
 class DashboardFragment : Fragment() {
 
-    private lateinit var dashboardViewModel: DashboardViewModel
     private lateinit var state: GlobalState
+    private lateinit var sharedViewModel: SharedViewModel
     private val TAG = DashboardFragment::class.java.simpleName
+    private lateinit var searchResultAdapter: SearchResultAdapter
+    private lateinit var rvSearchResults: RecyclerView
+    private var myContext: FragmentActivity? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        dashboardViewModel =
-            ViewModelProviders.of(this).get(DashboardViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_dashboard, container, false)
-        val textView: TextView = root.findViewById(R.id.text_dashboard)
-        dashboardViewModel.text.observe(this, Observer {
-            textView.text = it
-        })
+        sharedViewModel = activity?.run {
+                ViewModelProviders.of(this)[SharedViewModel::class.java]
+            } ?: throw Exception("Invalid Activity")
+
+        rvSearchResults = root.findViewById(R.id.rvSearchResults)
+        val searchInput = root.findViewById<EditText>(R.id.searchInput)
 
         state = activity?.application as GlobalState
 
-        val searchTracks = state.spotifyWebApi?.search(state.spotifyHeaders, "Tetema", "track")
-
-        searchTracks?.enqueue(object : Callback<SearchResult>{
-            override fun onFailure(call: Call<SearchResult>, t: Throwable) {
-                Log.e(TAG, "Couldn't perform search request", t)
-                textView.text = "Couldn't perform search request"
+        searchInput.addTextChangedListener(object: TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {
+                // Do nothing
+                sharedViewModel.performSearch(p0.toString())
             }
 
-            override fun onResponse(call: Call<SearchResult>, response: Response<SearchResult>) {
-                var results = response.body()
-                var tracks = results?.tracks?.items
-                textView.text = "Recieved ${tracks?.size} results"
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                // Do nothing
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                // Do nothing
             }
 
         })
 
+        initRecyclerView()
+
         return root
     }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        this.myContext = context as MainActivity
+    }
+
+    private fun initRecyclerView() {
+
+        searchResultAdapter = SearchResultAdapter(myContext, state.spotifyAppRemote!!)
+        rvSearchResults.adapter = searchResultAdapter
+        rvSearchResults.layoutManager = LinearLayoutManager(activity)
+        val touchCallbackList = ListRecyclerTouchCallback(searchResultAdapter)
+        val itemTouchHelper = ItemTouchHelper(touchCallbackList)
+        itemTouchHelper.attachToRecyclerView(rvSearchResults)
+
+        val itemDecoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
+
+        rvSearchResults.addItemDecoration(itemDecoration)
+
+        sharedViewModel.searchResult.observe(this, Observer {
+            searchResultAdapter.searchResults = it
+            searchResultAdapter.notifyDataSetChanged()
+        })
+    }
+
+
 }

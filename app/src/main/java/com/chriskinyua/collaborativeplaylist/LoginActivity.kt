@@ -19,6 +19,7 @@ class LoginActivity : AppCompatActivity() {
     private val CLIENT_ID = "23435e1e97574bbab9f95fb2923baefe"
     private val REQUEST_CODE = 1337
     private val REDIRECT_URI = "https://com.chriskinyua.collaborativeplaylist/callback"
+    private val TAG = LoginActivity::class.java.simpleName
     private lateinit var state: GlobalState
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +44,7 @@ class LoginActivity : AppCompatActivity() {
         SpotifyAppRemote.connect(this, connectionParams, object : Connector.ConnectionListener {
             override fun onConnected(appRemote: SpotifyAppRemote) {
                 state.spotifyAppRemote = appRemote
-                tvStatus.text = "Connected! Yay"
+                tvStatus.text = "Spotify Remote is Connected!"
                 Log.d("LoginActivity", "Connected! Yay!")
                 // Now you can start interacting with App Remote
 
@@ -77,6 +78,7 @@ class LoginActivity : AppCompatActivity() {
                 AuthenticationResponse.Type.TOKEN -> {
                     state.ACCESS_TOKEN = response.accessToken
                     state.spotifyHeaders["Authorization"] = "Bearer ${response.accessToken}"
+                    Log.d(TAG, response.accessToken)
                     val intent = Intent(this@LoginActivity,MainActivity::class.java)
                     startActivity(intent)
                 }

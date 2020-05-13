@@ -3,13 +3,19 @@ package com.chriskinyua.weatherapp.adapter
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.chriskinyua.collaborativeplaylist.R
+import com.chriskinyua.collaborativeplaylist.data.TrackModel
 import com.chriskinyua.shoppinglist.touch.ListItemTouchHelperCallback
 import com.spotify.android.appremote.api.SpotifyAppRemote
 import com.spotify.protocol.types.Track
@@ -20,9 +26,9 @@ import java.util.*
 
 class PlaylistAdapter: RecyclerView.Adapter<PlaylistAdapter.ViewHolder>, ListItemTouchHelperCallback {
 
-    val playlist: MutableList<Track> = mutableListOf()
+    var playlist: MutableList<TrackModel> = mutableListOf()
     private val context: Context
-    private lateinit var spotifyAppRemote: SpotifyAppRemote
+    private val spotifyAppRemote: SpotifyAppRemote
     private val TAG = PlaylistAdapter::class.java.simpleName
 
     constructor(context: Context, appRemote: SpotifyAppRemote ){
@@ -44,24 +50,42 @@ class PlaylistAdapter: RecyclerView.Adapter<PlaylistAdapter.ViewHolder>, ListIte
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val currentTrack = playlist[position]
+        val images = currentTrack.album?.images
 
-        spotifyAppRemote.imagesApi.getImage(currentTrack.imageUri).setResultCallback {image ->
-            Glide
-                .with(context)
-                .load(image)
-                .centerCrop()
-                .placeholder(ColorDrawable(Color.BLACK))
-                .into(holder.ivTrackImage)
-        }.setErrorCallback {throwable ->
-            //TODO: Set placeholder image
-            Log.e(TAG, "Error fetching image: ${currentTrack.name}", throwable)
-        }
+        Glide
+            .with(context)
+            .load(images?.get(0)?.url)
+            .centerCrop()
+            .placeholder(ColorDrawable(Color.BLACK))
+            .listener(object: RequestListener<Drawable> {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    Log.e(TAG, "Problem Loading Image", e)
+                    return false
+                }
+
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    return false
+                }
+
+            })
+            .into(holder.ivTrackImage)
 
 
         holder.tvTrackName.text = currentTrack.name
-        val artistNames = mutableListOf<String>()
-        currentTrack.artists.forEach{
-            artistNames.add(it.name)
+        val artistNames = mutableListOf<String?>()
+        currentTrack.artists?.forEach { artist ->
+            artistNames.add(artist.name)
         }
 
         holder.tvArtists.text = artistNames.joinToString(separator = ", ")
@@ -69,7 +93,7 @@ class PlaylistAdapter: RecyclerView.Adapter<PlaylistAdapter.ViewHolder>, ListIte
 
 
 
-    fun addListItem(track: Track){
+    fun addListItem(track: TrackModel){
         if(!playlist.contains(track)){
             playlist.add(0, track)
             notifyItemInserted(0)
@@ -89,7 +113,7 @@ class PlaylistAdapter: RecyclerView.Adapter<PlaylistAdapter.ViewHolder>, ListIte
 //        (context as ScrollingActivity).showSnackBar(4)
     }
 
-    fun updateListItem(track: Track, editIndex: Int){
+    fun updateListItem(track: TrackModel, editIndex: Int){
         playlist.set(editIndex, track)
         notifyItemChanged(editIndex)
     }
