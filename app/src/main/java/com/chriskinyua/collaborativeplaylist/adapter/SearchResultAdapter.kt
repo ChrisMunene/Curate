@@ -93,41 +93,9 @@ class SearchResultAdapter: RecyclerView.Adapter<SearchResultAdapter.ViewHolder>,
 
         holder.searchResultCard.setOnClickListener {
             context.addToQueue(currentTrack)
+            context.removeFromSearchResults(position)
             Toast.makeText(context, "Added to queue", Toast.LENGTH_LONG).show()
         }
-    }
-
-
-
-    fun addListItem(track: TrackModel){
-        if(!searchResults.contains(track)){
-            searchResults.add(0, track)
-            notifyItemInserted(0)
-            Log.d(TAG, "${track.name} added to list")
-        }
-    }
-
-    fun addAllListItems(items: List<TrackModel>){
-        searchResults.addAll(items)
-        notifyDataSetChanged()
-        Log.d(TAG, "${items.size} items added to list")
-    }
-
-    fun deleteListItem(position: Int){
-        searchResults.removeAt(position)
-        notifyItemRemoved(position)
-//        (context as ScrollingActivity).showSnackBar(3)
-    }
-
-    fun deleteAllListItems(){
-        searchResults.clear()
-        notifyDataSetChanged()
-//        (context as ScrollingActivity).showSnackBar(4)
-    }
-
-    fun updateListItem(track: TrackModel, editIndex: Int){
-        searchResults.set(editIndex, track)
-        notifyItemChanged(editIndex)
     }
 
 
@@ -139,7 +107,7 @@ class SearchResultAdapter: RecyclerView.Adapter<SearchResultAdapter.ViewHolder>,
     }
 
     override fun onDismissed(position: Int) {
-        deleteListItem(position)
+        context?.removeFromSearchResults(position)
     }
 
     override fun onItemMoved(fromPosition: Int, toPosition: Int) {

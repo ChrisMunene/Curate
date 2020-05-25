@@ -15,7 +15,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.chriskinyua.collaborativeplaylist.data.RecommendationResults
 import com.chriskinyua.collaborativeplaylist.data.TrackModel
-import com.chriskinyua.collaborativeplaylist.network.NativeApi
+import com.chriskinyua.collaborativeplaylist.network.RecommendationsApi
 import com.chriskinyua.collaborativeplaylist.state.GlobalState
 import com.chriskinyua.collaborativeplaylist.ui.SharedViewModel
 import com.chriskinyua.collaborativeplaylist.ui.home.HomeFragment
@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity(), RecommendationDialog.RecommendationHan
     private val TAG = MainActivity::class.java.simpleName
     private lateinit var navController: NavController
     private lateinit var sharedViewModel: SharedViewModel
-    private lateinit var nativeApi: NativeApi
+    private lateinit var recommendationsApi: RecommendationsApi
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +44,8 @@ class MainActivity : AppCompatActivity(), RecommendationDialog.RecommendationHan
             ViewModelProviders.of(this).get(SharedViewModel::class.java)
 
         state = application as GlobalState
+
+        state.socket?.connect()
 
         navController = findNavController(R.id.nav_host_fragment)
         // Passing each menu ID as a set of Ids because each
@@ -58,16 +60,18 @@ class MainActivity : AppCompatActivity(), RecommendationDialog.RecommendationHan
         navView.setupWithNavController(navController)
 
         val retrofit = Retrofit.Builder()
-            .baseUrl(NativeApi.BASE_URL)
+            .baseUrl(RecommendationsApi.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-        nativeApi = retrofit.create(NativeApi::class.java)
+        recommendationsApi = retrofit.create(RecommendationsApi::class.java)
 
     }
 
     fun addToQueue(track: TrackModel){
+
         sharedViewModel.addToQueue(track)
+
         if(!queueInitialized){
             state.spotifyAppRemote?.playerApi?.play(track.uri)
             queueInitialized = true
@@ -94,7 +98,7 @@ class MainActivity : AppCompatActivity(), RecommendationDialog.RecommendationHan
 
     override fun getRecommendations(seed: String) {
         Log.d(TAG, "Getting Recommendations")
-        val generate = nativeApi.getRecommendations(seed, state.ACCESS_TOKEN!!)
+        val generate = recommendationsApi.getRecommendations(seed, state.ACCESS_TOKEN!!)
         val navHost = supportFragmentManager.primaryNavigationFragment
         val homeFragment = navHost?.childFragmentManager?.primaryNavigationFragment as HomeFragment?
         homeFragment?.showProgressBar()
@@ -124,7 +128,23 @@ class MainActivity : AppCompatActivity(), RecommendationDialog.RecommendationHan
             }
 
         })
+    }
 
+    fun removeFromQueue(position: Int){
+        Log.d(TAG, "Removed at $position")
+        sharedViewModel.removeFromQueue(position)
+    }
+
+    fun removeAllFromQueue(){
+        sharedViewModel.removeAllFromQueue()
+    }
+
+    fun removeFromSearchResults(position: Int){
+        sharedViewModel.removeFromSearchResults(position)
+    }
+
+    fun removeAllFromSearchResults(){
+        sharedViewModel.removeAllFromSearchResults()
     }
 
 }

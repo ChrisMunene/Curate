@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginBottom="4dp"
-            android:text="TextView"
+            android:text="@string/textview"
             card_view:layout_constraintBottom_toTopOf="@+id/guideline"
             card_view:layout_constraintStart_toEndOf="@+id/ivTrackImage" />
 
@@ -48,7 +48,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="4dp"
-            android:text="TextView"
+            android:text="@string/textview"
             card_view:layout_constraintStart_toEndOf="@+id/ivTrackImage"
             card_view:layout_constraintTop_toTopOf="@+id/guideline" />
 

@@ -15,7 +15,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            android:text="Generating playlist...."
+            android:text="@string/generating_playlist"
             app:layout_constraintBottom_toTopOf="@+id/pbGenerate"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -69,7 +69,7 @@
             android:id="@+id/btnRecommendations"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Generate Playlist"
+            android:text="@string/generate_playlist"
             app:layout_constraintBottom_toTopOf="@+id/guideline2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

@@ -8,7 +8,7 @@ import retrofit2.http.GET
 import retrofit2.http.HeaderMap
 import retrofit2.http.Query
 
-interface NativeApi{
+interface RecommendationsApi{
 
     companion object{
         const val BASE_URL: String = "https://api-starter-spotify.herokuapp.com/"

@@ -1,8 +1,7 @@
 package com.chriskinyua.collaborativeplaylist.controllers
 
-import android.nfc.Tag
+
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.chriskinyua.collaborativeplaylist.data.SearchResults
 import com.chriskinyua.collaborativeplaylist.data.TrackModel
@@ -57,11 +56,27 @@ class Repository(private val application: GlobalState) {
     }
 
     fun removeFromQueue(position: Int){
-        playlist.value?.removeAt(position)
+        val trackList = playlist.value
+        trackList!!.removeAt(position)
+        playlist.value = trackList
+    }
+
+    fun removeFromSearchResults(position: Int){
+        val trackList = searchResults.value
+        trackList!!.removeAt(position)
+        searchResults.value = trackList
     }
 
     fun removeAllFromQueue(){
-        playlist.value?.clear()
+        val trackList = playlist.value
+        trackList!!.clear()
+        playlist.value = trackList
+    }
+
+    fun removeAllFromSearchResults(){
+        val trackList = searchResults.value
+        trackList!!.clear()
+        searchResults.value = trackList
     }
 
 }

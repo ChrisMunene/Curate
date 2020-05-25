@@ -8,12 +8,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.chriskinyua.collaborativeplaylist.MainActivity
 import com.chriskinyua.collaborativeplaylist.R
 import com.chriskinyua.collaborativeplaylist.data.TrackModel
 import com.chriskinyua.shoppinglist.touch.ListItemTouchHelperCallback
@@ -27,12 +29,12 @@ import java.util.*
 class PlaylistAdapter: RecyclerView.Adapter<PlaylistAdapter.ViewHolder>, ListItemTouchHelperCallback {
 
     var playlist: MutableList<TrackModel> = mutableListOf()
-    private val context: Context
+    private val context: MainActivity?
     private val spotifyAppRemote: SpotifyAppRemote
     private val TAG = PlaylistAdapter::class.java.simpleName
 
     constructor(context: Context, appRemote: SpotifyAppRemote ){
-        this.context = context
+        this.context = context as MainActivity
         this.spotifyAppRemote = appRemote
     }
 
@@ -53,7 +55,7 @@ class PlaylistAdapter: RecyclerView.Adapter<PlaylistAdapter.ViewHolder>, ListIte
         val images = currentTrack.album?.images
 
         Glide
-            .with(context)
+            .with(context!!)
             .load(images?.get(0)?.url)
             .centerCrop()
             .placeholder(ColorDrawable(Color.BLACK))
@@ -89,33 +91,10 @@ class PlaylistAdapter: RecyclerView.Adapter<PlaylistAdapter.ViewHolder>, ListIte
         }
 
         holder.tvArtists.text = artistNames.joinToString(separator = ", ")
-    }
 
-
-
-    fun addListItem(track: TrackModel){
-        if(!playlist.contains(track)){
-            playlist.add(0, track)
-            notifyItemInserted(0)
-            Log.d("PlaylistAdapter", "${track.name} added to list")
+        holder.btnDelete.setOnClickListener {
+            context.removeFromQueue(position)
         }
-    }
-
-    fun deleteListItem(position: Int){
-        playlist.removeAt(position)
-        notifyItemRemoved(position)
-//        (context as ScrollingActivity).showSnackBar(3)
-    }
-
-    fun deleteAllListItems(){
-        playlist.clear()
-        notifyDataSetChanged()
-//        (context as ScrollingActivity).showSnackBar(4)
-    }
-
-    fun updateListItem(track: TrackModel, editIndex: Int){
-        playlist.set(editIndex, track)
-        notifyItemChanged(editIndex)
     }
 
 
@@ -123,10 +102,11 @@ class PlaylistAdapter: RecyclerView.Adapter<PlaylistAdapter.ViewHolder>, ListIte
         val ivTrackImage  = itemView.ivTrackImage
         val tvArtists = itemView.tvArtists
         val tvTrackName = itemView.tvTrackName
+        val btnDelete = itemView.btnDelete
     }
 
     override fun onDismissed(position: Int) {
-        deleteListItem(position)
+        context?.removeFromQueue(position)
     }
 
     override fun onItemMoved(fromPosition: Int, toPosition: Int) {

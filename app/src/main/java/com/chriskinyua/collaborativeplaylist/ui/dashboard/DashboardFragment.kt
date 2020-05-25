@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.EditText
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
@@ -50,24 +51,18 @@ class DashboardFragment : Fragment() {
 
         rvSearchResults = root.findViewById(R.id.rvSearchResults)
         val searchInput = root.findViewById<EditText>(R.id.searchInput)
+        val btnSearch = root.findViewById<Button>(R.id.btnSearch)
 
         state = activity?.application as GlobalState
 
-        searchInput.addTextChangedListener(object: TextWatcher {
-            override fun afterTextChanged(p0: Editable?) {
-                // Do nothing
-                sharedViewModel.performSearch(p0.toString())
+        btnSearch.setOnClickListener {
+            if(searchInput.text.isNotEmpty()){
+                sharedViewModel.performSearch(searchInput.text.toString())
+            } else {
+                searchInput.error = "Search query cannot be empty"
             }
+        }
 
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                // Do nothing
-            }
-
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                // Do nothing
-            }
-
-        })
 
         initRecyclerView()
 
