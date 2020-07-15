@@ -13,6 +13,6 @@ The algorithm gathers user-generated playlists matching the key words and their 
  - [Glide Image Library](https://github.com/bumptech/glide)
  - [Android Architecture Components](https://developer.android.com/topic/libraries/architecture)
 
-## Demo
+Here's a walkthrough of implemented user stories:
 
-![Demo](screencast.gif)
+<img src='screencast.gif' title='Video Walkthrough' width='300' height='600' alt='Video Walkthrough' />
